@@ -1,0 +1,8 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "jupyterlab-highlight-selected-word",
+  "description": "jupyterlab-highlight-selected-word settings.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

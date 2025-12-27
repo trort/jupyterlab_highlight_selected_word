@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.5.1
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: ''
+author_name: Antigravity
+has_ai_rules: false
+has_binder: false
+has_settings: true
+kind: frontend
+labextension_name: jupyterlab-highlight-selected-word
+project_short_description: Highlight selected word in JupyterLab
+python_name: jupyterlab_highlight_selected_word
+repository: https://github.com/example/jupyterlab-highlight-selected-word
+test: true
+
