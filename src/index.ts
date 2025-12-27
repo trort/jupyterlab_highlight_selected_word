@@ -93,16 +93,17 @@ class NotebookHighlighter {
 
     // Actually, we SHOULD disconnect previous. But we don't track "previous active cell".
     // Let's just add the connection. It's cheap.
-
+    const editor = cell.editor;
+    if (!editor) {
+      return;
+    }
     cell.editor?.model.selections.changed.connect(this._onSelectionChanged, this);
   }
 
   private _onSelectionChanged() {
     // Basic check to ensure we are only processing for the active cell to avoid noise
-    if (this._panel.content.activeCell === arguments[0]) {
-      // sender might not be passed correctly in arguments[0] by signal?
-      // Actually, let's just loose check.
-    }
+    // sender might not be passed correctly in arguments[0] by signal?
+    // Actually, let's just loose check.
     // Only process if the signaling cell is actually the active one
     // (This avoids processing events from background cells if we leave listeners attached)
     // Actually, we can't easily access the sender cell in the callback without wrapping.
@@ -113,7 +114,6 @@ class NotebookHighlighter {
 
   private _scheduleUpdate() {
     if (!this._settings.enableOnLoad) {
-      this._broadcast(null);
       return;
     }
     if (this._updateTimeout) clearTimeout(this._updateTimeout);
@@ -236,6 +236,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Track notebooks
     const controllers = new WeakMap<NotebookPanel, NotebookHighlighter>();
 
+    const addController = (panel: NotebookPanel) => {
+      if (controllers.has(panel)) return;
+      const controller = new NotebookHighlighter(panel, currentSettings);
+      controllers.set(panel, controller);
+
+      panel.disposed.connect(() => {
+        controller.dispose();
+        controllers.delete(panel);
+      });
+    };
+
     // Function to load settings
     const loadSettings = (settings: ISettingRegistry.ISettings) => {
       currentSettings = {
@@ -261,13 +272,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
     };
 
     tracker.widgetAdded.connect((sender, panel) => {
-      const controller = new NotebookHighlighter(panel, currentSettings);
-      controllers.set(panel, controller);
+      addController(panel);
+    });
 
-      panel.disposed.connect(() => {
-        controller.dispose();
-        controllers.delete(panel);
-      });
+    // Handle existing notebooks
+    tracker.forEach(panel => {
+      addController(panel);
     });
 
     if (settingRegistry) {
