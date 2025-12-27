@@ -1,8 +1,44 @@
 {
-  "jupyter.lab.shortcuts": [],
-  "title": "jupyterlab-highlight-selected-word",
-  "description": "jupyterlab-highlight-selected-word settings.",
+  "title": "Highlight Selected Word",
+  "description": "Settings for the Highlight Selected Word extension.",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "highlightColor": {
+      "type": "string",
+      "title": "Highlight Color",
+      "description": "CSS color for the highlight background (e.g. '#d7d4f0', 'rgba(255, 255, 0, 0.3)').",
+      "default": "#d7d4f0"
+    },
+    "outlineColor": {
+      "type": "string",
+      "title": "Outline Color",
+      "description": "CSS color for the highlight outline.",
+      "default": "#ababab"
+    },
+    "minChars": {
+      "type": "number",
+      "title": "Minimum Characters",
+      "description": "Minimum number of characters required to trigger highlighting.",
+      "default": 2
+    },
+    "wholeWords": {
+      "type": "boolean",
+      "title": "Whole Words Only",
+      "description": "Only highlight matches that are whole words.",
+      "default": true
+    },
+    "delay": {
+      "type": "number",
+      "title": "Debounce Delay (ms)",
+      "description": "Delay in milliseconds before highlighting triggers after selection changes.",
+      "default": 100
+    },
+    "enableOnLoad": {
+      "type": "boolean",
+      "title": "Enable on Load",
+      "description": "Enable highlighting by default when JupyterLab starts.",
+      "default": true
+    }
+  },
   "additionalProperties": false
 }

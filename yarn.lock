@@ -1569,7 +1569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/search@npm:^6.5.10":
+"@codemirror/search@npm:^6.5.10, @codemirror/search@npm:^6.5.11":
   version: 6.5.11
   resolution: "@codemirror/search@npm:6.5.11"
   dependencies:
@@ -1580,7 +1580,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/state@npm:^6.0.0, @codemirror/state@npm:^6.4.0, @codemirror/state@npm:^6.5.0, @codemirror/state@npm:^6.5.2":
+"@codemirror/state@npm:^6.0.0, @codemirror/state@npm:^6.4.0, @codemirror/state@npm:^6.5.0, @codemirror/state@npm:^6.5.2, @codemirror/state@npm:^6.5.3":
   version: 6.5.3
   resolution: "@codemirror/state@npm:6.5.3"
   dependencies:
@@ -1589,7 +1589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.38.1":
+"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.38.1, @codemirror/view@npm:^6.39.7":
   version: 6.39.7
   resolution: "@codemirror/view@npm:6.39.7"
   dependencies:
@@ -7782,8 +7782,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jupyterlab-highlight-selected-word@workspace:."
   dependencies:
+    "@codemirror/search": ^6.5.11
+    "@codemirror/state": ^6.5.3
+    "@codemirror/view": ^6.39.7
     "@jupyterlab/application": ^4.0.0
     "@jupyterlab/builder": ^4.0.0
+    "@jupyterlab/cells": ^4.5.1
+    "@jupyterlab/codemirror": ^4.5.1
+    "@jupyterlab/notebook": ^4.5.1
     "@jupyterlab/settingregistry": ^4.0.0
     "@jupyterlab/testutils": ^4.0.0
     "@types/jest": ^29.2.0
