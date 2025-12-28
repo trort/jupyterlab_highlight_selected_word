@@ -76,7 +76,9 @@ class NotebookHighlighter {
   }
 
   dispose() {
-    if (this._updateTimeout) clearTimeout(this._updateTimeout);
+    if (this._updateTimeout) {
+      clearTimeout(this._updateTimeout);
+    }
     // Disconnect signals? They usually auto-disconnect on dispose of sender/receiver.
   }
 
@@ -143,7 +145,9 @@ class NotebookHighlighter {
     if (!this._settings.enableOnLoad) {
       return;
     }
-    if (this._updateTimeout) clearTimeout(this._updateTimeout);
+    if (this._updateTimeout) {
+      clearTimeout(this._updateTimeout);
+    }
     this._updateTimeout = setTimeout(
       () => this._updateQuery(),
       this._settings.delay
@@ -323,7 +327,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const controllers = new WeakMap<NotebookPanel, NotebookHighlighter>();
 
     const addController = (panel: NotebookPanel) => {
-      if (controllers.has(panel)) return;
+      if (controllers.has(panel)) {
+        return;
+      }
       const controller = new NotebookHighlighter(panel, currentSettings);
       controllers.set(panel, controller);
 

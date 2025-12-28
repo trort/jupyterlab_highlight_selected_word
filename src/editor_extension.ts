@@ -24,7 +24,7 @@ export const highlightField = StateField.define<DecorationSet>({
     decorations = decorations.map(tr.changes);
 
     // Check if the query has changed
-    for (let e of tr.effects) {
+    for (const e of tr.effects) {
       if (e.is(setHighlightQuery)) {
         decorations = matchHighlighter(tr.state.doc.toString(), e.value);
       }
