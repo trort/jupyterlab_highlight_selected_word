@@ -53,19 +53,39 @@ function matchHighlighter(text: string, query: RegExp | null): DecorationSet {
 // Compartment for dynamic theme configuration
 export const themeCompartment = new Compartment();
 
-export function createThemeExtension(bgColor: string, outlineColor: string): Extension {
+export function createThemeExtension(
+    highlightColor: string,
+    outlineColor: string,
+    highlightColorBlurred: string,
+    outlineWidth: number,
+    outlineOnly: boolean
+): Extension {
+    // Styles for focused editor
+    const focusedStyle = {
+        backgroundColor: outlineOnly ? 'transparent' : highlightColor,
+        outline: `${outlineWidth}px solid ${outlineColor}`
+    };
+
+    // Styles for non-focused editor (blurred)
+    const blurredStyle = {
+        backgroundColor: outlineOnly ? 'transparent' : highlightColorBlurred,
+        outline: `${outlineWidth}px solid ${highlightColorBlurred}` // Original had separate color for outline blur? params.highlight_color_blurred. Yes.
+    };
+
     return EditorView.baseTheme({
-        ".jp-HighlightSelected": {
-            backgroundColor: bgColor,
-            outline: `1px solid ${outlineColor}`
-        }
+        // Default (unfocused)
+        ".jp-HighlightSelected": blurredStyle,
+
+        // Focused editor override
+        ".cm-editor.cm-focused .jp-HighlightSelected": focusedStyle
     });
 }
 
+
 export function highlightExtension(): Extension {
-    // Default theme
+    // Default theme (will be updated by settings immediately on load)
     return [
         highlightField,
-        themeCompartment.of(createThemeExtension("#d7d4f0", "#ababab"))
+        themeCompartment.of(createThemeExtension("#d7d4f0", "#ababab", "#e6e4f5", 1, false))
     ];
 }

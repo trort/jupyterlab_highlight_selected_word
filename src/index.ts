@@ -18,19 +18,29 @@ import { setHighlightQuery, highlightExtension, themeCompartment, createThemeExt
 interface IPluginSettings {
   highlightColor: string;
   outlineColor: string;
+  highlightColorBlurred: string;
+  outlineWidth: number;
+  outlineOnly: boolean;
+  codeCellsOnly: boolean;
   minChars: number;
   wholeWords: boolean;
   delay: number;
   enableOnLoad: boolean;
+  highlightWordUnderCursor: boolean;
 }
 
 const DEFAULT_SETTINGS: IPluginSettings = {
   highlightColor: "#d7d4f0",
   outlineColor: "#ababab",
+  highlightColorBlurred: "#e6e4f5",
+  outlineWidth: 1,
+  outlineOnly: false,
+  codeCellsOnly: false,
   minChars: 2,
   wholeWords: true,
   delay: 100,
-  enableOnLoad: true
+  enableOnLoad: true,
+  highlightWordUnderCursor: false
 };
 
 /**
@@ -122,24 +132,43 @@ class NotebookHighlighter {
 
   private _updateQuery() {
     const cell = this._panel.content.activeCell;
-    if (!cell || !cell.editor) return;
+    if (!cell || !cell.editor) {
+      return;
+    }
 
-    const editor = cell.editor;
-    const selection = editor.getSelection();
-    const { start, end } = selection;
+    // Use CodeMirror 6 EditorView and State directly for better introspection
+    const cmEditor = (cell.editor as any)?.editor as EditorView;
+    if (!cmEditor) {
+      return;
+    }
+
+    const state = cmEditor.state;
+    const selection = state.selection.main;
 
     let text = "";
 
-    // Single line selection concern
-    if (start.line === end.line) {
-      const lineText = editor.getLine(start.line);
-      if (lineText) {
-        text = lineText.substring(start.column, end.column);
+    if (selection.empty) {
+      if (this._settings.highlightWordUnderCursor) {
+        const word = state.wordAt(selection.head);
+        if (word) {
+          text = state.sliceDoc(word.from, word.to);
+        }
+      } else {
+        this._broadcast(null);
+        return;
       }
     } else {
-      // Multi-line: ignore
-      this._broadcast(null);
-      return;
+      // Handle non-empty selection
+      if (selection.from < selection.to) {
+        // Check if multi-line
+        const doc = state.doc;
+        const lineStart = doc.lineAt(selection.from).number;
+        const lineEnd = doc.lineAt(selection.to).number;
+
+        if (lineStart === lineEnd) {
+          text = state.sliceDoc(selection.from, selection.to);
+        }
+      }
     }
 
     // Validation
@@ -149,13 +178,7 @@ class NotebookHighlighter {
       return;
     }
 
-    // Verify word characters if needed, or allow any?
-    // "Highlight selected word" implies word.
-    // But maybe user wants to highlight "=="?
-    // Let's stick to alphanumeric check from design defaults if implicit, but code might want symbols.
-    // Design proposal said "valid characters".
-    // Original extension had `[\\w$]` token check.
-    // Let's implement a loose check: if it's whitespace only, ignore.
+    // Verify word characters logic...
     if (!text.trim()) {
       this._broadcast(null);
       return;
@@ -177,14 +200,35 @@ class NotebookHighlighter {
   private _broadcast(query: RegExp | null) {
     const cells = this._panel.content.widgets;
     cells.forEach(cell => {
-      if (cell.model.type === 'code') {
-        // We need to get the CM6 EditorView
-        // In JLab 4 with @jupyterlab/codemirror, cell.editor is a CodeMirrorEditorWrapper
-        // It exposes `.editor` which is the EditorView
+      // Check for codeCellsOnly setting
+      if (this._settings.codeCellsOnly && cell.model.type !== 'code') {
+        // If we are enforcing code-only, ensure specific cell is cleared if it happens to have an editor (e.g. raw)
+        // But usually we just skip dispatching highlight query to it, or dispatch null?
+        // The original extension filtered "relevant cells".
+        // Here, if we don't broadcast, the old state might persist?
+        // CodeMirror state effects are persistent until changed.
+        // So we should probably dispatch NULL to filtered cells to ensure they are cleared.
+        // But `setHighlightQuery` is the effect.
+        // Let's dispatch null to non-code cells if settings require it.
+      }
+
+      // Logic: if codeCellsOnly is true, only 'code' type gets query.
+      // If false, 'code', 'markdown', 'raw' all get query (if they have editors).
+      const shouldBroadcast = !this._settings.codeCellsOnly || cell.model.type === 'code';
+
+      if (shouldBroadcast) {
         const cmEditor = (cell.editor as any)?.editor as EditorView;
         if (cmEditor) {
           cmEditor.dispatch({
             effects: setHighlightQuery.of(query)
+          });
+        }
+      } else {
+        // Ensure we clear highlights in non-code cells if the setting was just toggled
+        const cmEditor = (cell.editor as any)?.editor as EditorView;
+        if (cmEditor) {
+          cmEditor.dispatch({
+            effects: setHighlightQuery.of(null)
           });
         }
       }
@@ -193,16 +237,22 @@ class NotebookHighlighter {
 
   private _broadcastTheme() {
     const cells = this._panel.content.widgets;
-    const themeExtension = createThemeExtension(this._settings.highlightColor, this._settings.outlineColor);
+    const themeExtension = createThemeExtension(
+      this._settings.highlightColor,
+      this._settings.outlineColor,
+      this._settings.highlightColorBlurred,
+      this._settings.outlineWidth,
+      this._settings.outlineOnly
+    );
 
     cells.forEach(cell => {
-      if (cell.model.type === 'code') {
-        const cmEditor = (cell.editor as any)?.editor as EditorView;
-        if (cmEditor) {
-          cmEditor.dispatch({
-            effects: themeCompartment.reconfigure(themeExtension)
-          });
-        }
+      // Provide theme to all cells, or only code? 
+      // Probably all cells that have editors.
+      const cmEditor = (cell.editor as any)?.editor as EditorView;
+      if (cmEditor) {
+        cmEditor.dispatch({
+          effects: themeCompartment.reconfigure(themeExtension)
+        });
       }
     });
   }
@@ -225,13 +275,25 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension jupyterlab-highlight-selected-word is activated!');
 
+    const command = 'jupyterlab-highlight-selected-word:toggle';
+    app.commands.addCommand(command, {
+      label: 'Toggle Highlight Selected Word',
+      execute: () => {
+        if (settingRegistry) {
+          settingRegistry.load(plugin.id).then(settings => {
+            const value = settings.get('enableOnLoad').composite as boolean;
+            settings.set('enableOnLoad', !value);
+          });
+        }
+      }
+    });
     // Register the editor extension
     editorExtensions.addExtension({
       name: 'jupyterlab-highlight-selected-word:editor',
       factory: () => EditorExtensionRegistry.createImmutableExtension(highlightExtension())
     });
 
-    let currentSettings = { ...DEFAULT_SETTINGS };
+    let currentSettings: IPluginSettings = { ...DEFAULT_SETTINGS };
 
     // Track notebooks
     const controllers = new WeakMap<NotebookPanel, NotebookHighlighter>();
@@ -252,18 +314,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
       currentSettings = {
         highlightColor: settings.get('highlightColor').composite as string || DEFAULT_SETTINGS.highlightColor,
         outlineColor: settings.get('outlineColor').composite as string || DEFAULT_SETTINGS.outlineColor,
+        highlightColorBlurred: settings.get('highlightColorBlurred').composite as string || DEFAULT_SETTINGS.highlightColorBlurred,
+        outlineWidth: settings.get('outlineWidth').composite as number || DEFAULT_SETTINGS.outlineWidth,
+        outlineOnly: settings.get('outlineOnly').composite as boolean ?? DEFAULT_SETTINGS.outlineOnly,
+        codeCellsOnly: settings.get('codeCellsOnly').composite as boolean ?? DEFAULT_SETTINGS.codeCellsOnly,
         minChars: settings.get('minChars').composite as number || DEFAULT_SETTINGS.minChars,
         wholeWords: settings.get('wholeWords').composite as boolean ?? DEFAULT_SETTINGS.wholeWords,
         delay: settings.get('delay').composite as number || DEFAULT_SETTINGS.delay,
-        enableOnLoad: settings.get('enableOnLoad').composite as boolean ?? DEFAULT_SETTINGS.enableOnLoad
+        enableOnLoad: settings.get('enableOnLoad').composite as boolean ?? DEFAULT_SETTINGS.enableOnLoad,
+        highlightWordUnderCursor: settings.get('highlightWordUnderCursor').composite as boolean ?? DEFAULT_SETTINGS.highlightWordUnderCursor
       };
-      console.log('Highlight settings loaded:', currentSettings);
+      console.log('[Highlight] Settings loaded:', currentSettings);
 
       // Update all controllers
       tracker.forEach(panel => {
-        // We need a way to get the controller associated with the panel.
-        // Since `controllers` WeakMap was inside the closure, we can access it if we move it to broader scope
-        // or we can just iterate if we have access.
         const controller = controllers.get(panel);
         if (controller) {
           controller.updateSettings(currentSettings);

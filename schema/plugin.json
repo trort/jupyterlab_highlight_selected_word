@@ -15,6 +15,30 @@
       "description": "CSS color for the highlight outline.",
       "default": "#ababab"
     },
+    "highlightColorBlurred": {
+      "type": "string",
+      "title": "Blurred Highlight Color",
+      "description": "CSS color for the highlight background in unfocused cells.",
+      "default": "#e6e4f5"
+    },
+    "outlineWidth": {
+      "type": "number",
+      "title": "Outline Width (px)",
+      "description": "Width of the outline in pixels.",
+      "default": 1
+    },
+    "outlineOnly": {
+      "type": "boolean",
+      "title": "Outline Only",
+      "description": "Show only outline (transparent background).",
+      "default": false
+    },
+    "codeCellsOnly": {
+      "type": "boolean",
+      "title": "Code Cells Only",
+      "description": "Restrict highlighting to code cells only.",
+      "default": false
+    },
     "minChars": {
       "type": "number",
       "title": "Minimum Characters",
@@ -26,6 +50,12 @@
       "title": "Whole Words Only",
       "description": "Only highlight matches that are whole words.",
       "default": true
+    },
+    "highlightWordUnderCursor": {
+      "type": "boolean",
+      "title": "Highlight Word Under Cursor",
+      "description": "Automatically highlight the word under the cursor when there is no text selected.",
+      "default": false
     },
     "delay": {
       "type": "number",
@@ -40,5 +70,14 @@
       "default": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "jupyter.lab.shortcuts": [
+    {
+      "command": "jupyterlab-highlight-selected-word:toggle",
+      "keys": [
+        "Alt H"
+      ],
+      "selector": "body"
+    }
+  ]
 }
