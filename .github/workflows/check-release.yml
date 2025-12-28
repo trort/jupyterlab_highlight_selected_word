@@ -1,7 +1,5 @@
 name: Check Release
 on:
-  push:
-    tags: ["*"]
   workflow_dispatch:
   pull_request:
     branches: ["*"]
