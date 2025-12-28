@@ -1,6 +1,6 @@
 # jupyterlab_highlight_selected_word
 
-[![Github Actions Status](https://github.com/example/jupyterlab-highlight-selected-word/workflows/Build/badge.svg)](https://github.com/example/jupyterlab-highlight-selected-word/actions/workflows/build.yml)
+[![Github Actions Status](https://github.com/trort/jupyterlab-highlight-selected-word/workflows/Build/badge.svg)](https://github.com/trort/jupyterlab-highlight-selected-word/actions/workflows/build.yml)
 
 Highlight selected word in JupyterLab
 
