@@ -7,9 +7,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/trort/jupyterlab-highlight-selected-word",
+    "homepage": "https://github.com/trort/jupyterlab_highlight_selected_word",
     "bugs": {
-        "url": "https://github.com/trort/jupyterlab-highlight-selected-word/issues"
+        "url": "https://github.com/trort/jupyterlab_highlight_selected_word/issues"
     },
     "license": "BSD-3-Clause",
     "author": "Antigravity",
@@ -24,7 +24,7 @@
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/trort/jupyterlab-highlight-selected-word.git"
+        "url": "https://github.com/trort/jupyterlab_highlight_selected_word.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",

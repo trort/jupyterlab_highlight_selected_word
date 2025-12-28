@@ -74,9 +74,7 @@
   "jupyter.lab.shortcuts": [
     {
       "command": "jupyterlab-highlight-selected-word:toggle",
-      "keys": [
-        "Alt H"
-      ],
+      "keys": ["Alt H"],
       "selector": "body"
     }
   ]

@@ -7,10 +7,18 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 import { Cell } from '@jupyterlab/cells';
 import { EditorView } from '@codemirror/view';
-import { IEditorExtensionRegistry, EditorExtensionRegistry } from '@jupyterlab/codemirror';
+import {
+  IEditorExtensionRegistry,
+  EditorExtensionRegistry
+} from '@jupyterlab/codemirror';
 
 // Import our custom extension parts
-import { setHighlightQuery, highlightExtension, themeCompartment, createThemeExtension } from './editor_extension';
+import {
+  setHighlightQuery,
+  highlightExtension,
+  themeCompartment,
+  createThemeExtension
+} from './editor_extension';
 
 /**
  * Interface for extension settings
@@ -30,9 +38,9 @@ interface IPluginSettings {
 }
 
 const DEFAULT_SETTINGS: IPluginSettings = {
-  highlightColor: "#d7d4f0",
-  outlineColor: "#ababab",
-  highlightColorBlurred: "#e6e4f5",
+  highlightColor: '#d7d4f0',
+  outlineColor: '#ababab',
+  highlightColorBlurred: '#e6e4f5',
   outlineWidth: 1,
   outlineOnly: false,
   codeCellsOnly: false,
@@ -56,7 +64,10 @@ class NotebookHighlighter {
     this._settings = settings;
 
     // Listen for active cell changes
-    this._panel.content.activeCellChanged.connect(this._onActiveCellChanged, this);
+    this._panel.content.activeCellChanged.connect(
+      this._onActiveCellChanged,
+      this
+    );
 
     // Initial attach
     if (this._panel.content.activeCell) {
@@ -74,7 +85,10 @@ class NotebookHighlighter {
     this._settings = newSettings;
 
     // If colors changed, we need to broadcast theme update
-    if (oldSettings.highlightColor !== newSettings.highlightColor || oldSettings.outlineColor !== newSettings.outlineColor) {
+    if (
+      oldSettings.highlightColor !== newSettings.highlightColor ||
+      oldSettings.outlineColor !== newSettings.outlineColor
+    ) {
       this._broadcastTheme();
     }
 
@@ -97,7 +111,7 @@ class NotebookHighlighter {
     // We need to listen to the model's selection changes
     // Prior listeners are not removed on the old cell, but since we debounce and only use the *current* active cell
     // in the callback, it *should* be fine if we are careful.
-    // Ideally we should disconnect the old one. 
+    // Ideally we should disconnect the old one.
     // For simplicity in this MVP: just add listener. The signal slot mechanism handles some deduping if method bound context is same.
     // But we are using an anonymous arrow? No, let's use a bound method if possible or accept some overhead.
 
@@ -107,7 +121,10 @@ class NotebookHighlighter {
     if (!editor) {
       return;
     }
-    cell.editor?.model.selections.changed.connect(this._onSelectionChanged, this);
+    cell.editor?.model.selections.changed.connect(
+      this._onSelectionChanged,
+      this
+    );
   }
 
   private _onSelectionChanged() {
@@ -127,7 +144,10 @@ class NotebookHighlighter {
       return;
     }
     if (this._updateTimeout) clearTimeout(this._updateTimeout);
-    this._updateTimeout = setTimeout(() => this._updateQuery(), this._settings.delay);
+    this._updateTimeout = setTimeout(
+      () => this._updateQuery(),
+      this._settings.delay
+    );
   }
 
   private _updateQuery() {
@@ -145,7 +165,7 @@ class NotebookHighlighter {
     const state = cmEditor.state;
     const selection = state.selection.main;
 
-    let text = "";
+    let text = '';
 
     if (selection.empty) {
       if (this._settings.highlightWordUnderCursor) {
@@ -185,7 +205,7 @@ class NotebookHighlighter {
     }
 
     // It's a valid word!
-    const flag = "g";
+    const flag = 'g';
     const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // TODO: Use settings for whole-word
     let regexSource = escaped;
@@ -214,7 +234,8 @@ class NotebookHighlighter {
 
       // Logic: if codeCellsOnly is true, only 'code' type gets query.
       // If false, 'code', 'markdown', 'raw' all get query (if they have editors).
-      const shouldBroadcast = !this._settings.codeCellsOnly || cell.model.type === 'code';
+      const shouldBroadcast =
+        !this._settings.codeCellsOnly || cell.model.type === 'code';
 
       if (shouldBroadcast) {
         const cmEditor = (cell.editor as any)?.editor as EditorView;
@@ -246,7 +267,7 @@ class NotebookHighlighter {
     );
 
     cells.forEach(cell => {
-      // Provide theme to all cells, or only code? 
+      // Provide theme to all cells, or only code?
       // Probably all cells that have editors.
       const cmEditor = (cell.editor as any)?.editor as EditorView;
       if (cmEditor) {
@@ -273,7 +294,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
     editorExtensions: IEditorExtensionRegistry,
     settingRegistry: ISettingRegistry | null
   ) => {
-    console.log('JupyterLab extension jupyterlab-highlight-selected-word is activated!');
+    console.log(
+      'JupyterLab extension jupyterlab-highlight-selected-word is activated!'
+    );
 
     const command = 'jupyterlab-highlight-selected-word:toggle';
     app.commands.addCommand(command, {
@@ -290,7 +313,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Register the editor extension
     editorExtensions.addExtension({
       name: 'jupyterlab-highlight-selected-word:editor',
-      factory: () => EditorExtensionRegistry.createImmutableExtension(highlightExtension())
+      factory: () =>
+        EditorExtensionRegistry.createImmutableExtension(highlightExtension())
     });
 
     let currentSettings: IPluginSettings = { ...DEFAULT_SETTINGS };
@@ -312,17 +336,38 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Function to load settings
     const loadSettings = (settings: ISettingRegistry.ISettings) => {
       currentSettings = {
-        highlightColor: settings.get('highlightColor').composite as string || DEFAULT_SETTINGS.highlightColor,
-        outlineColor: settings.get('outlineColor').composite as string || DEFAULT_SETTINGS.outlineColor,
-        highlightColorBlurred: settings.get('highlightColorBlurred').composite as string || DEFAULT_SETTINGS.highlightColorBlurred,
-        outlineWidth: settings.get('outlineWidth').composite as number || DEFAULT_SETTINGS.outlineWidth,
-        outlineOnly: settings.get('outlineOnly').composite as boolean ?? DEFAULT_SETTINGS.outlineOnly,
-        codeCellsOnly: settings.get('codeCellsOnly').composite as boolean ?? DEFAULT_SETTINGS.codeCellsOnly,
-        minChars: settings.get('minChars').composite as number || DEFAULT_SETTINGS.minChars,
-        wholeWords: settings.get('wholeWords').composite as boolean ?? DEFAULT_SETTINGS.wholeWords,
-        delay: settings.get('delay').composite as number || DEFAULT_SETTINGS.delay,
-        enableOnLoad: settings.get('enableOnLoad').composite as boolean ?? DEFAULT_SETTINGS.enableOnLoad,
-        highlightWordUnderCursor: settings.get('highlightWordUnderCursor').composite as boolean ?? DEFAULT_SETTINGS.highlightWordUnderCursor
+        highlightColor:
+          (settings.get('highlightColor').composite as string) ||
+          DEFAULT_SETTINGS.highlightColor,
+        outlineColor:
+          (settings.get('outlineColor').composite as string) ||
+          DEFAULT_SETTINGS.outlineColor,
+        highlightColorBlurred:
+          (settings.get('highlightColorBlurred').composite as string) ||
+          DEFAULT_SETTINGS.highlightColorBlurred,
+        outlineWidth:
+          (settings.get('outlineWidth').composite as number) ||
+          DEFAULT_SETTINGS.outlineWidth,
+        outlineOnly:
+          (settings.get('outlineOnly').composite as boolean) ??
+          DEFAULT_SETTINGS.outlineOnly,
+        codeCellsOnly:
+          (settings.get('codeCellsOnly').composite as boolean) ??
+          DEFAULT_SETTINGS.codeCellsOnly,
+        minChars:
+          (settings.get('minChars').composite as number) ||
+          DEFAULT_SETTINGS.minChars,
+        wholeWords:
+          (settings.get('wholeWords').composite as boolean) ??
+          DEFAULT_SETTINGS.wholeWords,
+        delay:
+          (settings.get('delay').composite as number) || DEFAULT_SETTINGS.delay,
+        enableOnLoad:
+          (settings.get('enableOnLoad').composite as boolean) ??
+          DEFAULT_SETTINGS.enableOnLoad,
+        highlightWordUnderCursor:
+          (settings.get('highlightWordUnderCursor').composite as boolean) ??
+          DEFAULT_SETTINGS.highlightWordUnderCursor
       };
       console.log('[Highlight] Settings loaded:', currentSettings);
 
@@ -348,12 +393,18 @@ const plugin: JupyterFrontEndPlugin<void> = {
       settingRegistry
         .load(plugin.id)
         .then(settings => {
-          console.log('jupyterlab-highlight-selected-word settings loaded:', settings.composite);
+          console.log(
+            'jupyterlab-highlight-selected-word settings loaded:',
+            settings.composite
+          );
           loadSettings(settings);
           settings.changed.connect(loadSettings);
         })
         .catch(reason => {
-          console.error('Failed to load settings for jupyterlab-highlight-selected-word.', reason);
+          console.error(
+            'Failed to load settings for jupyterlab-highlight-selected-word.',
+            reason
+          );
         });
     }
   }
