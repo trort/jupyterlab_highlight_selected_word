@@ -1,6 +1,6 @@
 {
     "name": "jupyterlab-highlight-selected-word",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Highlight selected word in JupyterLab",
     "keywords": [
         "jupyter",
