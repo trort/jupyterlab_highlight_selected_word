@@ -1,12 +1,20 @@
-# jupyterlab_highlight_selected_word
+# Highlight Selected Word for JupyterLab
 
 [![Github Actions Status](https://github.com/trort/jupyterlab_highlight_selected_word/workflows/Build/badge.svg)](https://github.com/trort/jupyterlab_highlight_selected_word/actions/workflows/build.yml)
 
-Highlight selected word in JupyterLab
+A JupyterLab extension that highlights all instances of the selected word in the current editor or across all cells. This is a port of the popular [jupyter_highlight_selected_word](https://github.com/jcb91/jupyter_highlight_selected_word) nbextension for JupyterLab.
+
+## Features
+
+*   **Highlight Matches**: Automatically highlights all occurrences of the selected word in the current cell.
+*   **Global Highlighting**: Option to highlight matches across all cells in the notebook.
+*   **Customizable**: Configurable highlight colors, outline styles, and behavior.
+*   **Toggle Hotkey**: Quickly toggle highlighting on/off with `Alt + H`.
+*   **Intelligent Matching**: Options for whole-word matching and minimum character constraints.
 
 ## Requirements
 
-- JupyterLab >= 4.0.0
+*   JupyterLab >= 4.0.0
 
 ## Install
 
@@ -15,6 +23,29 @@ To install the extension, execute:
 ```bash
 pip install jupyterlab_highlight_selected_word
 ```
+
+## Usage
+
+1.  **Select Text**: Simply double-click a word or select text in any code cell. All other occurrences of that word in the cell (and optionally other cells) will be highlighted.
+2.  **Toggle**: Press `Alt + H` to toggle the highlighting functionality on or off.
+
+## Configuration
+
+You can configure the extension settings via the JupyterLab **Advanced Settings Editor** (`Settings` > `Settings Editor` > `Highlight Selected Word`) or by defining them in your `overrides.json`.
+
+| Setting | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **Highlight Color** | `string` | `#d7d4f0` | CSS color for the highlight background. |
+| **Blurred Highlight Color**| `string` | `#e6e4f5` | CSS color for the highlight background in unfocused cells. |
+| **Outline Color** | `string` | `#ababab` | CSS color for the highlight outline. |
+| **Outline Width** | `number` | `1` | Width of the outline in pixels. |
+| **Outline Only** | `boolean` | `false` | Show only outline (transparent background). |
+| **Code Cells Only** | `boolean` | `false` | Restrict highlighting to code cells only. |
+| **Minimum Characters** | `number` | `2` | Minimum number of characters required to trigger highlighting. |
+| **Whole Words Only** | `boolean` | `true` | Only highlight matches that are whole words. |
+| **Highlight Word Under Cursor** | `boolean` | `false` | Automatically highlight the word under the cursor when there is no text selected. |
+| **Debounce Delay** | `number` | `100` | Delay in milliseconds before highlighting triggers. |
+| **Enable on Load** | `boolean` | `true` | Enable highlighting by default when JupyterLab starts. |
 
 ## Uninstall
 
@@ -26,79 +57,4 @@ pip uninstall jupyterlab_highlight_selected_word
 
 ## Contributing
 
-### Development install
-
-Note: You will need NodeJS to build the extension package.
-
-The `jlpm` command is JupyterLab's pinned version of
-[yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
-`yarn` or `npm` in lieu of `jlpm` below.
-
-```bash
-# Clone the repo to your local environment
-# Change directory to the jupyterlab_highlight_selected_word directory
-
-# Set up a virtual environment and install package in development mode
-python -m venv .venv
-source .venv/bin/activate
-pip install --editable "."
-
-# Link your development version of the extension with JupyterLab
-jupyter labextension develop . --overwrite
-
-# Rebuild extension Typescript source after making changes
-# IMPORTANT: Unlike the steps above which are performed only once, do this step
-# every time you make a change.
-jlpm build
-```
-
-You can watch the source directory and run JupyterLab at the same time in different terminals to watch for changes in the extension's source and automatically rebuild the extension.
-
-```bash
-# Watch the source directory in one terminal, automatically rebuilding when needed
-jlpm watch
-# Run JupyterLab in another terminal
-jupyter lab
-```
-
-With the watch command running, every saved change will immediately be built locally and available in your running JupyterLab. Refresh JupyterLab to load the change in your browser (you may need to wait several seconds for the extension to be rebuilt).
-
-By default, the `jlpm build` command generates the source maps for this extension to make it easier to debug using the browser dev tools. To also generate source maps for the JupyterLab core extensions, you can run the following command:
-
-```bash
-jupyter lab build --minimize=False
-```
-
-### Development uninstall
-
-```bash
-pip uninstall jupyterlab_highlight_selected_word
-```
-
-In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
-command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `jupyterlab-highlight-selected-word` within that folder.
-
-### Testing the extension
-
-#### Frontend tests
-
-This extension is using [Jest](https://jestjs.io/) for JavaScript code testing.
-
-To execute them, execute:
-
-```sh
-jlpm
-jlpm test
-```
-
-#### Integration tests
-
-This extension uses [Playwright](https://playwright.dev/docs/intro) for the integration tests (aka user level tests).
-More precisely, the JupyterLab helper [Galata](https://github.com/jupyterlab/jupyterlab/tree/master/galata) is used to handle testing the extension in JupyterLab.
-
-More information are provided within the [ui-tests](./ui-tests/README.md) README.
-
-### Packaging the extension
-
-See [RELEASE](RELEASE.md)
+For development instructions, please see [CONTRIBUTING.md](CONTRIBUTING.md).
