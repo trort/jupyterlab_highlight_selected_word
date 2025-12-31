@@ -6,15 +6,15 @@ A JupyterLab extension that highlights all instances of the selected word in the
 
 ## Features
 
-*   **Highlight Matches**: Automatically highlights all occurrences of the selected word in the current cell.
-*   **Global Highlighting**: Option to highlight matches across all cells in the notebook.
-*   **Customizable**: Configurable highlight colors, outline styles, and behavior.
-*   **Toggle Hotkey**: Quickly toggle highlighting on/off with `Alt + H`.
-*   **Intelligent Matching**: Options for whole-word matching and minimum character constraints.
+- **Highlight Matches**: Automatically highlights all occurrences of the selected word in the current cell.
+- **Global Highlighting**: Option to highlight matches across all cells in the notebook.
+- **Customizable**: Configurable highlight colors, outline styles, and behavior.
+- **Toggle Hotkey**: Quickly toggle highlighting on/off with `Alt + H`.
+- **Intelligent Matching**: Options for whole-word matching and minimum character constraints.
 
 ## Requirements
 
-*   JupyterLab >= 4.0.0
+- JupyterLab >= 4.0.0
 
 ## Install
 
@@ -33,19 +33,19 @@ pip install jupyterlab_highlight_selected_word
 
 You can configure the extension settings via the JupyterLab **Advanced Settings Editor** (`Settings` > `Settings Editor` > `Highlight Selected Word`) or by defining them in your `overrides.json`.
 
-| Setting | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| **Highlight Color** | `string` | `#d7d4f0` | CSS color for the highlight background. |
-| **Blurred Highlight Color**| `string` | `#e6e4f5` | CSS color for the highlight background in unfocused cells. |
-| **Outline Color** | `string` | `#ababab` | CSS color for the highlight outline. |
-| **Outline Width** | `number` | `1` | Width of the outline in pixels. |
-| **Outline Only** | `boolean` | `false` | Show only outline (transparent background). |
-| **Code Cells Only** | `boolean` | `false` | Restrict highlighting to code cells only. |
-| **Minimum Characters** | `number` | `2` | Minimum number of characters required to trigger highlighting. |
-| **Whole Words Only** | `boolean` | `true` | Only highlight matches that are whole words. |
-| **Highlight Word Under Cursor** | `boolean` | `false` | Automatically highlight the word under the cursor when there is no text selected. |
-| **Debounce Delay** | `number` | `100` | Delay in milliseconds before highlighting triggers. |
-| **Enable on Load** | `boolean` | `true` | Enable highlighting by default when JupyterLab starts. |
+| Setting                         | Type      | Default   | Description                                                                       |
+| :------------------------------ | :-------- | :-------- | :-------------------------------------------------------------------------------- |
+| **Highlight Color**             | `string`  | `#d7d4f0` | CSS color for the highlight background.                                           |
+| **Blurred Highlight Color**     | `string`  | `#e6e4f5` | CSS color for the highlight background in unfocused cells.                        |
+| **Outline Color**               | `string`  | `#ababab` | CSS color for the highlight outline.                                              |
+| **Outline Width**               | `number`  | `1`       | Width of the outline in pixels.                                                   |
+| **Outline Only**                | `boolean` | `false`   | Show only outline (transparent background).                                       |
+| **Code Cells Only**             | `boolean` | `false`   | Restrict highlighting to code cells only.                                         |
+| **Minimum Characters**          | `number`  | `2`       | Minimum number of characters required to trigger highlighting.                    |
+| **Whole Words Only**            | `boolean` | `true`    | Only highlight matches that are whole words.                                      |
+| **Highlight Word Under Cursor** | `boolean` | `false`   | Automatically highlight the word under the cursor when there is no text selected. |
+| **Debounce Delay**              | `number`  | `100`     | Delay in milliseconds before highlighting triggers.                               |
+| **Enable on Load**              | `boolean` | `true`    | Enable highlighting by default when JupyterLab starts.                            |
 
 ## Uninstall
 
